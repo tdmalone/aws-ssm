@@ -115,7 +115,7 @@ func (c *Controller) HandleSecrets(cli kubernetes.Interface) error {
 	return err
 }
 
-func (c *Controller) RunOnce() error {
+func (c *Controller) RunOnce(cli kubernetes.Interface, cli kubernetes.Interface) error {
 	log.Info("Running...")
 	cli, err := c.KubeGen.KubeClient()
 	if err != nil {
