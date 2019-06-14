@@ -19,7 +19,7 @@ import (
 	"time"
 
 	"github.com/cmattoon/aws-ssm/pkg/config"
-	"github.com/cmattoon/aws-ssm/pkg/configmap"
+	"github.com/tdmalone/aws-ssm/pkg/configmap"
 	"github.com/cmattoon/aws-ssm/pkg/provider"
 	"github.com/cmattoon/aws-ssm/pkg/secret"
 	log "github.com/sirupsen/logrus"

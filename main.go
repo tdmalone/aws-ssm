@@ -24,7 +24,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/cmattoon/aws-ssm/pkg/config"
-	"github.com/cmattoon/aws-ssm/pkg/controller"
+	"github.com/tdmalone/aws-ssm/pkg/controller"
 )
 
 func main() {
