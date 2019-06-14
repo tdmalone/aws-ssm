@@ -138,7 +138,7 @@
 		 Data:       map[string]string{},
 	 }
 	 require.NoError(t, s.Set("foo", "bar"))
-	 assert.Equal(t, s.ConfigMap.StringData["foo"], "bar")
+	 assert.Equal(t, s.ConfigMap.Data["foo"], "bar")
  }
 
  func TestSetRefusesToOverwriteKey(t *testing.T) {
@@ -159,7 +159,7 @@
 	 // "foo=bar" was specified initially, not via Set
 	 // so strictly speaking, it shouldn't be set here yet
 	 // (because s.Set() should fail)
-	 assert.Equal(t, "", s.ConfigMap.StringData["foo"])
+	 assert.Equal(t, "", s.ConfigMap.Data["foo"])
  }
 
  func TestSetsValue(t *testing.T) {
@@ -192,7 +192,7 @@
 	 }
 
 	 for k, v := range exp {
-		 v3, ok := ts.ConfigMap.StringData[k]
+		 v3, ok := ts.ConfigMap.Data[k]
 		 assert.Equal(t, ok, true)
 		 assert.Equal(t, v, v3)
 	 }

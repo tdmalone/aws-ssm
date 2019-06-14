@@ -177,15 +177,15 @@
 
  func (s *ConfigMap) Set(key string, val string) (err error) {
 	 log.Debugf("Setting key=%s", key)
-	 if s.ConfigMap.StringData == nil {
-		 s.ConfigMap.StringData = make(map[string]string)
+	 if s.ConfigMap.Data == nil {
+		 s.ConfigMap.Data = make(map[string]string)
 	 }
-	 // StringData isn't populated initially, so check s.Data
+	 // Data isn't populated initially, so check s.Data
 	 if _, ok := s.Data[key]; ok {
 		 // Refuse to overwite existing keys
 		 return errors.New(fmt.Sprintf("Key '%s' already exists for ConfigMap %s/%s", key, s.Namespace, s.Name))
 	 }
-	 s.ConfigMap.StringData[key] = val
+	 s.ConfigMap.Data[key] = val
 	 return
  }
 
