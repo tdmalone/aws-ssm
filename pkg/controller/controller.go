@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/cmattoon/aws-ssm/pkg/config"
+	"github.com/cmattoon/aws-ssm/pkg/configmap"
 	"github.com/cmattoon/aws-ssm/pkg/provider"
 	"github.com/cmattoon/aws-ssm/pkg/secret"
 	log "github.com/sirupsen/logrus"
@@ -50,6 +51,37 @@ func NewController(cfg *config.Config) *Controller {
 	}
 
 	return ctrl
+}
+
+func (c *Controller) HandleConfigMaps(cli kubernetes.Interface) error {
+	configmaps, err := cli.CoreV1().ConfigMaps("").List(metav1.ListOptions{})
+	if err != nil {
+		log.Fatalf("Error retrieving configmaps: %s", err)
+	}
+
+	i, j, k := 0, 0, 0
+	for _, sec := range configmaps.Items {
+		i += 1
+
+		obj, err := configmap.FromKubernetesConfigMap(c.Provider, sec)
+		if err != nil {
+			// Error: Irrelevant ConfigMap
+			continue
+		}
+		j += 1
+
+		_, err = obj.UpdateObject(cli)
+		if err != nil {
+			log.Warnf("Failed to update object %s/%s", obj.Namespace, obj.Name)
+			log.Warn(err.Error())
+			continue
+		}
+		log.Infof("Successfully updated %s/%s", obj.Namespace, obj.Name)
+		k += 1
+	}
+
+	log.Infof("Updated %v/%v configmaps (of %v total configmaps)", k, j, i)
+	return err
 }
 
 func (c *Controller) HandleSecrets(cli kubernetes.Interface) error {
@@ -89,7 +121,7 @@ func (c *Controller) RunOnce() error {
 	if err != nil {
 		log.Fatalf("Error with kubernetes client: %s", err)
 	}
-	return c.HandleSecrets(cli)
+	return c.HandleConfigMaps(cli), c.HandleSecrets(cli)
 }
 
 func (c *Controller) Run(stopChan <-chan struct{}) {
@@ -98,9 +130,12 @@ func (c *Controller) Run(stopChan <-chan struct{}) {
 	defer ticker.Stop()
 
 	for {
-		err := c.RunOnce()
-		if err != nil {
-			log.Error(err)
+		errConfigMaps, errSecrets := c.RunOnce()
+		if errConfigMaps != nil {
+			log.Error(errConfigMaps)
+		}
+		if errSecrets != nil {
+			log.Error(errSecrets)
 		}
 
 		select {
